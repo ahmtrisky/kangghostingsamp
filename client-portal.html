@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Download Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-dark: #0284c7;
+            --secondary: #06b6d4;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: #1e293b;
+            --success: #10b981;
+            --gradient: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            padding: 60px 0 40px;
+            text-align: center;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: var(--gray);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin: 40px 0;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 18px 50px 18px 24px;
+            background: var(--dark);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            color: var(--light);
+            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+        }
+
+        .search-box::after {
+            content: '🔍';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 30px 0 50px;
+            animation: fadeInUp 0.8s ease 0.3s backwards;
+        }
+
+        .category-btn {
+            padding: 10px 24px;
+            background: var(--dark);
+            border: 2px solid var(--border);
+            border-radius: 30px;
+            color: var(--light);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--gradient);
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+
+        /* Download Cards */
+        .downloads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+
+        .download-card {
+            background: var(--dark);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .download-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 40px rgba(14, 165, 233, 0.2);
+        }
+
+        .download-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--light);
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-description {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--light);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+            border-top: 2px solid var(--border);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .downloads-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .categories {
+                gap: 8px;
+            }
+
+            .category-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="logo">Mas Risky FILE</h1>
+            <p class="tagline">Download Semua File Disini</p>
+        </header>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Cari file atau dokumen...">
+            </div>
+        </div>
+
+        <div class="categories" id="categories">
+            <button class="category-btn active" data-category="all">Semua</button>
+            <button class="category-btn" data-category="Cleo">Cleo</button>
+            <button class="category-btn" data-category="Modpack">Modpack</button>
+            <button class="category-btn" data-category="Texture">Texture</button>
+            <button class="category-btn" data-category="Models">Models</button>
+        </div>
+
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Memuat file...</p>
+        </div>
+
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>Tidak ada file ditemukan</h3>
+            <p>Coba ubah kata kunci pencarian atau filter kategori</p>
+        </div>
+
+        <div class="downloads-grid" id="downloadsGrid"></div>
+
+        <footer>
+            <p>&copy; 2026 Client Download Portal. Semua hak dilindungi.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data file download (EDIT BAGIAN INI SESUAI KEBUTUHAN ANDA)
+        const downloadData = [
+            {
+                id: 1,
+                title: 'Link download GTA SAMP',
+                description: 'Cheat GTA yang kalian Pakai',
+                category: 'Cleo',
+                icon: '📄',
+                size: '30GB',
+                version: 'v1.2',
+                date: '2026-02-01',
+                downloadUrl: 'https://www.youtube.com/watch?v=GOafsiy8JcA#', // Ganti dengan link download Anda
+                infoUrl: '#' // Link ke info lebih lanjut (optional)
+            },
+            {
+                id: 2,
+                title: 'Design System UI Kit',
+                description: 'Komponen UI lengkap untuk Figma dan Adobe XD',
+                category: 'Models',
+                icon: '🎨',
+                size: '15.8 MB',
+                version: 'v2.0',
+                date: '2026-01-28',
+                downloadUrl: '#',
+                infoUrl: '#'
+            },
+            {
+                id: 3,
+                title: 'Analytics Dashboard Software',
+                description: 'Software monitoring dan analytics untuk business intelligence',
+                category: 'Texture',
+                icon: '📊',
+                size: '45.2 MB',
+                version: 'v3.1.5',
+                date: '2026-02-05',
+                downloadUrl: '#',
+                infoUrl: '#'
+            },
+            {
+                id: 4,
+                title: 'Brand Guidelines PDF',
+                description: 'Panduan lengkap penggunaan brand identity dan aset visual',
+                category: 'Models',
+                icon: '🎯',
+                size: '8.7 MB',
+                version: 'v1.0',
+                date: '2026-01-20',
+                downloadUrl: '#',
+                infoUrl: '#'
+            },
+            {
+                id: 5,
+                title: 'Marketing Video Pack',
+                description: 'Koleksi video marketing dan promotional materials',
+                category: 'Cleo',
+                icon: '🎬',
+                size: '125 MB',
+                version: 'v1.0',
+                date: '2026-02-03',
+                downloadUrl: '#',
+                infoUrl: '#'
+            },
+            {
+                id: 6,
+                title: 'Client Management Tool',
+                description: 'Aplikasi untuk mengelola database dan komunikasi klien',
+                category: 'Models',
+                icon: '💼',
+                size: '32.5 MB',
+                version: 'v2.4',
+                date: '2026-01-30',
+                downloadUrl: '#',
+                infoUrl: '#'
+            },
+            {
+                id: 7,
+                title: 'Social Media Templates',
+                description: 'Template siap pakai untuk Instagram, Facebook, dan LinkedIn',
+                category: 'Cleo',
+                icon: '📱',
+                size: '18.3 MB',
+                version: 'v1.5',
+                date: '2026-02-07',
+                downloadUrl: '#',
+                infoUrl: '#'
+            },
+            {
+                id: 8,
+                title: 'Training Materials',
+                description: 'Materi pelatihan dan onboarding untuk tim',
+                category: 'Models',
+                icon: '📚',
+                size: '12.1 MB',
+                version: 'v1.3',
+                date: '2026-01-25',
+                downloadUrl: '#',
+                infoUrl: '#'
+            }
+        ];
+
+        // State
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        // Render cards
+        function renderCards(data) {
+            const grid = document.getElementById('downloadsGrid');
+            const emptyState = document.querySelector('.empty-state');
+            
+            if (data.length === 0) {
+                grid.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            grid.innerHTML = data.map((item, index) => `
+                <div class="download-card" style="animation-delay: ${index * 0.1}s">
+                    <div class="card-header">
+                        <div class="file-icon">${item.icon}</div>
+                        <div class="card-info">
+                            <h3 class="card-title">${item.title}</h3>
+                            <div class="card-meta">
+                                <span class="meta-item">📦 ${item.size}</span>
+                                <span class="meta-item">🏷️ ${item.version}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="card-description">${item.description}</p>
+                    <div class="card-footer">
+                        <a href="${item.downloadUrl}" class="btn btn-primary" download>
+                            ⬇️ Download
+                        </a>
+                        <a href="${item.infoUrl}" class="btn btn-secondary">
+                            ℹ️
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter data
+        function filterData() {
+            let filtered = downloadData;
+
+            // Filter by category
+            if (currentCategory !== 'all') {
+                filtered = filtered.filter(item => item.category === currentCategory);
+            }
+
+            // Filter by search query
+            if (searchQuery) {
+                filtered = filtered.filter(item => 
+                    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.description.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+
+            renderCards(filtered);
+        }
+
+        // Category buttons
+        document.getElementById('categories').addEventListener('click', (e) => {
+            if (e.target.classList.contains('category-btn')) {
+                document.querySelectorAll('.category-btn').forEach(btn => 
+                    btn.classList.remove('active')
+                );
+                e.target.classList.add('active');
+                currentCategory = e.target.dataset.category;
+                filterData();
+            }
+        });
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            filterData();
+        });
+
+        // Initial render
+        renderCards(downloadData);
+    </script>
+</body>
+</html>
